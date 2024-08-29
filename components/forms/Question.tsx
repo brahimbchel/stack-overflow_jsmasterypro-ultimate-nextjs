@@ -134,18 +134,18 @@ const Question = () => {
                   }}
                   initialValue="<p>This is the initial content of the editor.</p>"
                   init={{
-                    height: 500,
+                    height: 350,
                     menubar: false,
                     plugins: [
-                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+                      'searchreplace', 'visualblocks', 'codesample', 'fullscreen',
+                      'insertdatetime', 'media', 'table'
                     ],
-                    toolbar: 'undo redo | blocks | ' +
-                      'bold italic forecolor | alignleft aligncenter ' +
-                      'alignright alignjustify | bullist numlist outdent indent | ' +
-                      'removeformat | help',
-                    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                    toolbar:
+                      'undo redo | ' +
+                      'codesample | bold italic forecolor | alignleft aligncenter |' +
+                      'alignright alignjustify | bullist numlist',
+                    content_style: 'body { font-family:Inter; font-size:16px }'
                   }}
                 />
               </FormControl>
