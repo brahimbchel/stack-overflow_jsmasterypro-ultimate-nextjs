@@ -18,14 +18,21 @@ import { Button } from "../ui/button"
 import { z } from 'zod'
 import { Badge } from '../ui/badge';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createQuestion } from '@/lib/actions/question.action';
+// import path from 'path';
 
 const type: any = 'create'
 
-const Question = () => {
+interface Props {
+  mongoUserId: string;
+}
+
+const Question = ({ mongoUserId }: Props) => {
   const editorRef = useRef(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
@@ -43,16 +50,13 @@ const Question = () => {
     setIsSubmitting(true);
 
     try {
-      // make an async call to your API -> create a question
-      // contain all form data
-
-      // await createQuestion({
-      //   title: values.title,
-      //   content: values.explanation,
-      //   tags: values.tags,
-      //   author: JSON.parse(mongoUserId),
-      //   path: pathname,
-      // });
+      await createQuestion({
+        title: values.title,
+        content: values.explanation,
+        tags: values.tags,
+        author: JSON.parse(mongoUserId),
+        path: pathname,
+      });
 
       // navigate to home page
       router.push('/');
@@ -120,7 +124,7 @@ const Question = () => {
 
         <FormField
           control={form.control}
-          name="explanation"
+          name="explanation"  // explanation
           render={({ field }) => (
             <FormItem className="flex w-full flex-col gap-3">
               <FormLabel className="paragraph-semibold text-dark400_light800">Detailed explanation of your problem <span className="text-primary-500">*</span></FormLabel>
@@ -132,6 +136,8 @@ const Question = () => {
                     // @ts-ignore
                     editorRef.current = editor
                   }}
+                  onBlur={field.onBlur}
+                  onEditorChange={(content) => field.onChange(content)}
                   initialValue="<p>This is the initial content of the editor.</p>"
                   init={{
                     height: 350,
