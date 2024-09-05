@@ -123,6 +123,7 @@ export interface GetUserByIdParams {
 }
 
 export interface GetAllUsersParams {
+  _id: string
   page?: number;
   pageSize?: number;
   filter?: string;
