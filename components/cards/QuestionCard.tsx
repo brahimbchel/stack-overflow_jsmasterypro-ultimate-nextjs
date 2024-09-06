@@ -1,13 +1,3 @@
-// import React from 'react'
-
-// const QuestionCard = () => {
-//   return (
-//     <div>QuestionCard</div>
-//   )
-// }
-
-// export default QuestionCard
-
 import Link from 'next/link';
 import React from 'react'
 import RenderTag from '../shared/RenderTag';
