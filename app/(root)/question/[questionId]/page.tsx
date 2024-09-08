@@ -1,40 +1,34 @@
-// import { getQuestionById } from '@/lib/actions/question.action'
-// import React from 'react'
-
-// const page = async ({ params }: { params: { questionId: string } }) => {
-//   const result = await getQuestionById({ questionId: params.questionId })
-
-//   console.log(result)
-
-//   return (
-//     <div>
-//       page {params.questionId}
-
-//       <h3>{result?.question.title}</h3>
-//     </div>
-//   )
-// }
-
-// export default page
-
-
-
-
-// -------------------------------- 
-
-
-// import Answer from '@/components/forms/Answer';
+import Answer from '@/components/forms/Answer';
+import AllAnswers from '@/components/shared/AllAnswers';
 import Metric from '@/components/shared/Metric';
 import ParseHTML from '@/components/shared/ParseHTML';
 import RenderTag from '@/components/shared/RenderTag';
 import { getQuestionById } from '@/lib/actions/question.action';
+import { getUserById } from '@/lib/actions/user.action';
 import { formatAndDivideNumber, getTimestamp } from '@/lib/utils';
+import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
 const Page = async ({ params, searchParams }: any) => {
   const result = await getQuestionById({ questionId: params.questionId });
+
+  const { userId: clerkId } = auth();
+  let mongoUser;
+
+  if (clerkId) {
+    mongoUser = await getUserById({ userId: clerkId })
+  }
+
+
+  // console.log('Question Result:', result);
+  // console.log('Mongo User:', mongoUser);
+
+
+  if (!result || !mongoUser) {
+    return <div>Question or user not found.</div>;
+  }
 
   return (
     <>
@@ -86,7 +80,6 @@ const Page = async ({ params, searchParams }: any) => {
         />
       </div>
 
-      {/* <ParseHTML /> */}
       <ParseHTML data={result.content} />
 
       <div className="mt-8 flex flex-wrap gap-2">
@@ -100,7 +93,25 @@ const Page = async ({ params, searchParams }: any) => {
         ))}
       </div>
 
-      {/* <Answer /> */}
+      {/* <AllAnswers
+        questionId={result._id}
+        userId={mongoUser._id}
+        totalAnswers={result.answers.length}
+      /> */}
+
+      {mongoUser && result && (
+        <AllAnswers
+          questionId={result._id}
+          userId={mongoUser._id}
+          totalAnswers={result.answers.length}
+        />
+      )}
+
+      <Answer
+        question={result.content}
+        questionId={result._id}
+        authorId={mongoUser._id}
+      />
     </>
   )
 }

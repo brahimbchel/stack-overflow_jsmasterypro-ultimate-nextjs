@@ -20,6 +20,7 @@ import { Badge } from '../ui/badge';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { createQuestion } from '@/lib/actions/question.action';
+import { useTheme } from '@/context/ThemeProvider';
 // import path from 'path';
 
 const type: any = 'create'
@@ -30,6 +31,7 @@ interface Props {
 
 const Question = ({ mongoUserId }: Props) => {
   const editorRef = useRef(null);
+  const { mode } = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -151,7 +153,9 @@ const Question = ({ mongoUserId }: Props) => {
                       'undo redo | ' +
                       'codesample | bold italic forecolor | alignleft aligncenter |' +
                       'alignright alignjustify | bullist numlist',
-                    content_style: 'body { font-family:Inter; font-size:16px }'
+                    content_style: 'body { font-family:Inter; font-size:16px }',
+                    skin: mode === "dark" ? "oxide-dark" : "oxide",
+                    content_css: mode === "dark" ? "dark" : "light",
                   }}
                 />
               </FormControl>
@@ -170,12 +174,6 @@ const Question = ({ mongoUserId }: Props) => {
             <FormItem className="flex w-full flex-col">
               <FormLabel className="paragraph-semibold text-dark400_light800">Tags <span className="text-primary-500">*</span></FormLabel>
               <FormControl className="mt-3.5">
-                {/* <Input
-                  placeholder="Add tags..."
-                  className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
-                  {...field} /> */}
-
-
                 <>
                   <Input
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
@@ -210,8 +208,6 @@ const Question = ({ mongoUserId }: Props) => {
             </FormItem>
           )}
         />
-
-        {/* <Button type="submit">Submit</Button> */}
 
         <Button type="submit" className="primary-gradient w-fit !text-light-900" disabled={isSubmitting}>
           {isSubmitting ? (

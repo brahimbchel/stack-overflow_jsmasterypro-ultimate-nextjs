@@ -13,7 +13,7 @@ export async function getQuestions(params: GetQuestionsParams) {
 
     const questions = await Question.find({})
       .populate({ path: 'tags', model: Tag })
-      .populate({ path: 'author', model: User })
+      .populate({ path: 'author', model: User }) // .populate({ path: 'answers', model: Answer })
       .sort({ createdAt: -1 })
 
     return { questions };

@@ -1,29 +1,23 @@
 import { Schema, models, model, Document } from 'mongoose';
 
-export interface IQuestion extends Document {
-  title: string;
+export interface IAnswer extends Document {
   content: string;
-  tags: Schema.Types.ObjectId[];
-  views: number;
   upvotes: Schema.Types.ObjectId[];
   downvotes: Schema.Types.ObjectId[];
   author: Schema.Types.ObjectId;
-  answers: Schema.Types.ObjectId[];
+  question: Schema.Types.ObjectId;
   createdAt: Date;
 }
 
-const QuestionSchema = new Schema({
-  title: { type: String, required: true },
+const AnswerSchema = new Schema({
   content: { type: String, required: true },
-  tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
-  views: { type: Number, default: 0 },
   upvotes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   downvotes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   author: { type: Schema.Types.ObjectId, ref: 'User' },
-  answers: [{ type: Schema.Types.ObjectId, ref: 'Answer' }],
+  question: { type: Schema.Types.ObjectId, ref: 'Question' },
   createdAt: { type: Date, default: Date.now }
 })
 
-const Question = models?.Question || model('Question', QuestionSchema);
+const Answer = models?.Answer || model('Answer', AnswerSchema);
 
-export default Question;
+export default Answer;
