@@ -10,7 +10,7 @@ import { getQuestions } from '@/lib/actions/question.action'
 import Link from 'next/link'
 import React from 'react'
 
-const Home = async () => {
+const page = async () => {
   const result = await getQuestions({});
 
   return (
@@ -54,7 +54,7 @@ const Home = async () => {
               title={question.title}
               tags={question.tags}
               author={question.author}
-              upvotes={question.upvotes}
+              upvotes={question.upvotes.length}
               views={question.views}
               answers={question.answers}
               createdAt={question.createdAt}
@@ -72,4 +72,4 @@ const Home = async () => {
   )
 }
 
-export default Home
+export default page
