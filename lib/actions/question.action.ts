@@ -147,3 +147,22 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     throw error;
   }
 }
+
+
+// export async function getQuestionsForUser (params) {
+//   try {
+//     connectToDatabase();
+
+//     const { clerkId } = params;
+
+//     const question = await Question.findOne({ author: clerkId})
+//       // .findById(questionId)
+//       // .populate({ path: 'tags', model: Tag, select: '_id name'})
+//       // .populate({ path: 'author', model: User, select: '_id clerkId name picture'})
+
+//       return { question };
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// }

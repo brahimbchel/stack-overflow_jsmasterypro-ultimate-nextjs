@@ -41,7 +41,6 @@ export async function getAllTags(params: GetAllTagsParams) {
   }
 }
 
-
 export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
   try {
     connectToDatabase();
