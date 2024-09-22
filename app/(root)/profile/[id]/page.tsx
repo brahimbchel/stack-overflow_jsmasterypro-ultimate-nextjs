@@ -5,12 +5,9 @@ import { SignedIn } from '@clerk/nextjs'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
 import React from 'react'
 import { getJoinedDate } from '@/lib/utils'
 import Stats from '@/components/shared/Stats'
-// import QuestionTab from '@/components/shared/QuestionTab'
-// import AnswersTab from '@/components/shared/AnswersTab'
 import { auth } from '@clerk/nextjs/server'
 import ProfileLink from '@/components/shared/ProfileLink'
 import QuestionTab from '@/components/shared/QuestionTab'
@@ -69,7 +66,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
         <div className="flex justify-end max-sm:mb-5 max-sm:w-full sm:mt-3">
           <SignedIn>
             {clerkId === userInfo.user.clerkId && (
-              <Link href="/profile/edit">
+              <Link href={`/profile/edit/`}>
                 <Button className="paragraph-medium btn-secondary text-dark300_light900 min-h-[46px] min-w-[175px] px-4 py-3">
                   Edit Profile
                 </Button>

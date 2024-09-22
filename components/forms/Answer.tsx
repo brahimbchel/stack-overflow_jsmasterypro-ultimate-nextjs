@@ -34,10 +34,8 @@ const Answer = ({ question, questionId, authorId }: Props) => {
   const handleCreateAnswer = async (values: z.infer<typeof AnswerSchema>) => {
     setIsSubmitting(true);
 
-    // console.log("Form Values: ", values);
 
     try {
-      // console.log("Start creating answer ");
       await createAnswer({
         content: values.answer,
         author: authorId,
@@ -52,7 +50,6 @@ const Answer = ({ question, questionId, authorId }: Props) => {
 
         editor.setContent('');
       }
-      // console.log("Done creating answer ");
 
     } catch (error) {
       console.log(error);

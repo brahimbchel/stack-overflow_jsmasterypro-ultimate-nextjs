@@ -22,11 +22,6 @@ const Page = async ({ params, searchParams }: any) => {
     mongoUser = await getUserById({ userId: clerkId })
   }
 
-
-  // console.log('Question Result:', result);
-  // console.log('Mongo User:', mongoUser);
-
-
   if (!result || !mongoUser) {
     return <div>Question or user not found.</div>;
   }
