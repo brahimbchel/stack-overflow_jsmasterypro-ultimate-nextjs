@@ -1,4 +1,5 @@
 "use client"
+
 import React, { useRef, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,16 +29,13 @@ interface Props {
   questionDetails?: string;
 }
 
-interface iQE {
-  title: string;
-  questionId: any
-  _id: string
+interface QuestionDetails {
+  tags: { name: string }[];
+  title: string
   content: string
-  path: string
-  tags: [{
-    name: string
-  }]
+  _id: string
 }
+
 
 const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const { mode } = useTheme();
@@ -46,16 +44,28 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const parsedQuestionDetails: iQE = JSON.parse(questionDetails || '');
+  // const parsedQuestionDetails = JSON.parse(questionDetails || '') || '';
+  // const parsedQuestionDetails = questionDetails ? JSON.parse(questionDetails) : null;
 
-  const groupedTags = parsedQuestionDetails.tags.map((tag) => tag.name)
+  let parsedQuestionDetails: QuestionDetails | null = null;
+
+  try {
+    parsedQuestionDetails = JSON.parse(questionDetails || '{}'); // Fallback to an empty object if questionDetails is null
+  } catch (error) {
+    console.error('Error parsing question details:', error);
+    parsedQuestionDetails = null;  // Handle the error and set to null if parsing fails
+  }
+
+
+  // const groupedTags = parsedQuestionDetails.tags.map((tag: any) => tag.name)
+  const groupedTags = parsedQuestionDetails?.tags?.map((tag: any) => tag.name) || [];
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof QuestionsSchema>>({
     resolver: zodResolver(QuestionsSchema),
     defaultValues: {
-      title: parsedQuestionDetails.title || '',
-      explanation: parsedQuestionDetails.content || '',
+      title: parsedQuestionDetails?.title || '',
+      explanation: parsedQuestionDetails?.content || '',
       tags: groupedTags || []
     },
   })
@@ -67,13 +77,13 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
     try {
       if (type === 'Edit') {
         await editQuestion({
-          questionId: parsedQuestionDetails._id,
+          questionId: parsedQuestionDetails?._id,
           title: values.title,
           content: values.explanation,
           path: pathname,
         })
 
-        router.push(`/question/${parsedQuestionDetails._id}`);
+        router.push(`/question/${parsedQuestionDetails?._id}`);
       } else {
         await createQuestion({
           title: values.title,
@@ -161,7 +171,7 @@ const Question = ({ type, mongoUserId, questionDetails }: Props) => {
                   }}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => field.onChange(content)}
-                  initialValue={parsedQuestionDetails.content || ''}
+                  initialValue={parsedQuestionDetails?.content || ''}
                   init={{
                     height: 350,
                     menubar: false,
