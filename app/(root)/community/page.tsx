@@ -3,12 +3,16 @@ import CommunityFilter from '@/components/community/CommunityFilter'
 import Filter from '@/components/shared/Filter'
 import LocalSearchbar from '@/components/shared/search/LocalSearchBar'
 import { UserFilters } from '@/constants/filters'
-import { getAllUser } from '@/lib/actions/user.action'
+import { getAllUsers } from '@/lib/actions/user.action'
+import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
 import React from 'react'
 
-const page = async () => {
-  const result = await getAllUser()
+const page = async ({ searchParams }: SearchParamsProps) => {
+  const result = await getAllUsers({
+    searchQuery: searchParams.q,
+    filter: searchParams.filter
+  });
 
   return (
     <>

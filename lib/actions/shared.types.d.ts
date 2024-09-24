@@ -11,7 +11,7 @@ export interface CreateAnswerParams {
 
 export interface GetAnswersParams {
   questionId: string;
-  sortBy?: string;
+  filter?: string;
   page?: number;
   pageSize?: number;
 }
@@ -123,7 +123,7 @@ export interface GetUserByIdParams {
 }
 
 export interface GetAllUsersParams {
-  _id: string
+  _id?: string
   page?: number;
   pageSize?: number;
   filter?: string;

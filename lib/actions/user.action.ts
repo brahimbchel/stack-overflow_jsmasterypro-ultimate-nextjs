@@ -1,11 +1,11 @@
 "use server"
 
-import User from "@/database/user.model";
+import User, { IUser } from "@/database/user.model";
 import { connectToDatabase } from "../mongoose"
-import { CreateUserParams, DeleteUserParams, GetSavedQuestionsParams, GetUserByIdParams, GetUserStatsParams, ToggleSaveQuestionParams, UpdateUserParams } from "./shared.types";
-import Question from "@/database/question.model";
+import { CreateUserParams, DeleteUserParams, GetAllUsersParams, GetSavedQuestionsParams, GetUserByIdParams, GetUserStatsParams, ToggleSaveQuestionParams, UpdateUserParams } from "./shared.types";
+import Question, { IQuestion } from "@/database/question.model";
 import { revalidatePath } from "next/cache";
-// import { FilterQuery } from "mongoose";
+import { FilterQuery } from "mongoose";
 import Tag from "@/database/tag.model";
 import Answer from "@/database/answer.model";
 
@@ -30,14 +30,39 @@ export async function getUserById(params: any) {
   }
 }
 
-export async function getAllUser() {
+export async function getAllUsers(params: GetAllUsersParams) {
   try {
     connectToDatabase();
 
+    const { searchQuery, filter } = params;
 
-    // console.log("All Users ... ");
+    const query: FilterQuery<IUser> = {};
 
-    const users = await User.find({})
+    if(searchQuery) {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, 'i') }},
+        { username: { $regex: new RegExp(searchQuery, 'i') }},
+      ]
+    }
+
+    let sortOption = {}
+    
+    switch(filter) {
+      case 'new_users':
+        sortOption = { joinedAt: -1 }
+        break
+        case 'old_users':
+        sortOption = { joinedAt: 1 }
+        break
+        case 'top_contributors':
+        sortOption = { reputation: 1 }
+        break
+      default:
+      break
+    }
+
+    const users = await User.find(query)
+      .sort(sortOption)
 
     return { users };
   } catch (error) {
@@ -151,14 +176,44 @@ export async function getSavedQuestions(params: GetSavedQuestionsParams) {
   try {
     connectToDatabase();
 
-    // const { clerkId, searchQuery } = params;
-    const { clerkId } = params;
+    const { clerkId, searchQuery, filter } = params;
+
+    const query: FilterQuery<IQuestion> = {};
+
+    if(searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, 'i') }},
+        { content: { $regex: new RegExp(searchQuery, 'i') }},
+      ]
+    }
+
+    let sortOption = {}
+    
+    switch(filter) {
+      case 'most_recent':
+        sortOption = { createdAt: -1 }
+        break
+      case 'oldest':
+        sortOption = { createdAt: 1 }
+        break
+      case 'most_voted': 
+          sortOption = { upvotes: -1 }
+        break
+      case 'most_viewed': 
+        sortOption = { views: -1 }
+        break
+        case 'most_answered': 
+        sortOption = { answers: -1 }
+        break
+      default:
+      break
+    }
 
     const user = await User.findOne({ clerkId }).populate({
       path: 'saved',
-      // match: query,
+      match: query,
       options: {
-        sort: { createdAt: -1 },
+        sort: sortOption,
       },
       populate: [
         { path: 'tags', model: Tag, select: "_id name" },

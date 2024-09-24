@@ -32,7 +32,36 @@ export async function getAllTags(params: GetAllTagsParams) {
   try {
     connectToDatabase();
 
-    const tags = await Tag.find({});
+    const {searchQuery, filter} = params
+
+    const query : FilterQuery<ITag> = {}
+
+    if(searchQuery) {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, 'i') }},
+      ]
+    }
+
+    let sortOption = {}
+    
+    switch(filter) {
+      case 'recent':
+        sortOption = { createdAt: -1 }
+        break
+      case 'old':
+        sortOption = { createdAt: 1 }
+        break
+      case 'popular': 
+          sortOption = { questions: -1 }   // query.answers = { $size: 0 } questions
+        break
+      case 'name': 
+        sortOption = { name: 1 }
+        break
+      default:
+      break
+    }
+
+    const tags = await Tag.find(query).sort(sortOption);
 
     return { tags }
   } catch (error) {
