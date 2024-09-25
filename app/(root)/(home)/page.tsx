@@ -3,6 +3,7 @@ import QuestionCard from '@/components/cards/QuestionCard'
 import HomeFilter from '@/components/home/HomeFilter'
 import Filter from '@/components/shared/Filter'
 import NoResult from '@/components/shared/NoResult'
+import Pagination from '@/components/shared/Pagination'
 import LocalSearchBar from '@/components/shared/search/LocalSearchBar'
 import { Button } from '@/components/ui/button'
 import { HomePageFilters } from '@/constants/filters'
@@ -12,10 +13,10 @@ import Link from 'next/link'
 import React from 'react'
 
 const page = async ({ searchParams }: SearchParamsProps) => {
-  // const result = await getQuestions({});
   const result = await getQuestions({
     searchQuery: searchParams.q,
-    filter: searchParams.filter
+    filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1,
   });
 
   return (
@@ -26,11 +27,6 @@ const page = async ({ searchParams }: SearchParamsProps) => {
           <Button className="primary-gradient min-h-[46px] px-4 py-3 !text-light-900">Ask a Question</Button>
         </Link>
       </div>
-
-      {/* <div className="">
-        <LocalSearchBar />
-        <Tags />
-      </div> */}
 
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchBar
@@ -72,6 +68,13 @@ const page = async ({ searchParams }: SearchParamsProps) => {
             linkTitle="Ask a Question"
           />
         }
+      </div>
+
+      <div className="mt-10">
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
     </>
   )
