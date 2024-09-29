@@ -8,6 +8,8 @@ import { revalidatePath } from "next/cache";
 import { FilterQuery } from "mongoose";
 import Tag from "@/database/tag.model";
 import Answer from "@/database/answer.model";
+import { BadgeCriteriaType } from "@/types";
+import { assignBadges } from "../utils";
 
 export async function getUserById(params: any) {
   try {
@@ -57,7 +59,7 @@ export async function getAllUsers(params: GetAllUsersParams) {
         sortOption = { joinedAt: 1 }
         break
         case 'top_contributors':
-        sortOption = { reputation: 1 }
+        sortOption = { reputation: -1 }
         break
       default:
       break
@@ -268,10 +270,52 @@ export async function getUserInfo(params: GetUserByIdParams) {
     const totalQuestions = await Question.countDocuments({ author: user._id })
     const totalAnswers = await Answer.countDocuments({ author: user._id });
 
+    const [questionUpvotes] = await Question.aggregate([
+      { $match: { author: user._id }},
+      { $project: {
+        _id: 0, upvotes: { $size: "$upvotes" }
+      }},
+      { $group: {
+        _id: null,
+        totalUpvotes: { $sum: "$upvotes" }
+      }}
+    ])
+
+    const [answerUpvotes] = await Answer.aggregate([
+      { $match: { author: user._id }},
+      { $project: {
+        _id: 0, upvotes: { $size: "$upvotes" }
+      }},
+      { $group: {
+        _id: null,
+        totalUpvotes: { $sum: "$upvotes" }
+      }}
+    ])
+
+    const [questionViews] = await Answer.aggregate([
+      { $match: { author: user._id }},
+      { $group: {
+        _id: null,
+        totalViews: { $sum: "$views" }
+      }}
+    ])
+
+    const criteria = [
+      { type: 'QUESTION_COUNT' as BadgeCriteriaType, count: totalQuestions },
+      { type: 'ANSWER_COUNT' as BadgeCriteriaType, count: totalAnswers },
+      { type: 'QUESTION_UPVOTES' as BadgeCriteriaType, count: questionUpvotes?.totalUpvotes || 0 },
+      { type: 'ANSWER_UPVOTES' as BadgeCriteriaType, count: answerUpvotes?.totalUpvotes || 0 },
+      { type: 'TOTAL_VIEWS' as BadgeCriteriaType, count: questionViews?.totalViews || 0 },
+    ]
+
+    const badgeCounts = assignBadges({ criteria });
+
     return {
       user,
       totalQuestions,
-      totalAnswers
+      totalAnswers,
+      badgeCounts,
+      reputation: user.reputation,
     }    
   } catch (error) {
     console.log(error);
@@ -323,3 +367,58 @@ export async function getUserAnswers(params: GetUserStatsParams) {
     throw error;
   }
 }
+
+// // count user badges, count question and question views
+
+// export async function userBudges(params) {
+//   try {
+//     connectToDatabase();
+
+//     const { userId } = params;
+//     let bronzeBudges = 0
+//     let silverBudges = 0
+//     let goldBudges = 0
+//     let remainingQuestionsAfterGold = 0
+//     let remainingQuestionsAfterSilver = 0
+//     let remainingViewsAfterGold = 0
+//     let remainingViewsAfterSilver = 0
+
+//     const totalQuestions = await Question.countDocuments({ author: userId})
+
+//     const questions = await Question.aggregate([
+//       {
+//         $group: {
+//           _id: null, // Group all documents together
+//           totalViewsOnQuestions: { $sum: "$views" } // Sum the "views" field
+//         }
+//       }
+//     ]);
+    
+//     const totalViewsOnQuestions = questions.length > 0 ? questions[0].totalViewsOnQuestions : 0;
+
+
+//     goldBudges = Math.floor(totalQuestions / 100);
+//     remainingQuestionsAfterGold = totalQuestions % 100;
+
+//     silverBudges = Math.floor(remainingQuestionsAfterGold / 50); 
+//     remainingQuestionsAfterSilver = remainingQuestionsAfterGold % 50;
+
+//     bronzeBudges = Math.floor(remainingQuestionsAfterSilver / 10); 
+
+
+//     goldBudges += Math.round(totalViewsOnQuestions / 100000);
+//     remainingViewsAfterGold = totalQuestions % 100000;
+
+//     silverBudges = Math.floor(remainingViewsAfterGold / 10000); 
+//     remainingViewsAfterSilver = remainingViewsAfterGold % 10000;
+
+//     bronzeBudges = Math.floor(remainingViewsAfterSilver / 10); 
+
+
+//     // return { totalQuestions, totalViewsOnQuestions };   
+//     return { bronzeBudges, silverBudges, goldBudges}
+//   } catch (error) {
+//     console.log(error);
+//     throw error;
+//   }
+// }
