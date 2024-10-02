@@ -1,4 +1,3 @@
-// import Tags from '@/components/shared/Tags'
 import QuestionCard from '@/components/cards/QuestionCard'
 import HomeFilter from '@/components/home/HomeFilter'
 import Filter from '@/components/shared/Filter'
@@ -11,6 +10,7 @@ import { getQuestions } from '@/lib/actions/question.action'
 import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
 import React from 'react'
+// import Loading from './loading'
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getQuestions({
@@ -18,6 +18,10 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
   });
+
+  // const isLoading = true
+
+  // if (isLoading) return <Loading />
 
   return (
     <>
