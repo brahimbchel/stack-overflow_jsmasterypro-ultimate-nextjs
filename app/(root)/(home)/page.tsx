@@ -10,7 +10,12 @@ import { getQuestions } from '@/lib/actions/question.action'
 import { SearchParamsProps } from '@/types'
 import Link from 'next/link'
 import React from 'react'
-// import Loading from './loading'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Bm Dev Overflow',
+  description: 'for developers seeking answers for their questions in general, and specify with tech questions',
+}
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const result = await getQuestions({
@@ -18,10 +23,6 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
   });
-
-  // const isLoading = true
-
-  // if (isLoading) return <Loading />
 
   return (
     <>
